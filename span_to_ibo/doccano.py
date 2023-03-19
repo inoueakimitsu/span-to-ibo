@@ -217,37 +217,37 @@ def doccano_exported_df_to_ibo_style_df_list(
     return iob_style_df_list
 
 
-def ibo_style_df_list_to_ibo_style_record_list(
-    ibo_style_df_list: List[IBOStyleDf]
-) -> List[IBOStyleRecord]:
-    """Convert list of IBO style dataframe to list of IBO style record.
+def ibo_style_df_list_to_list_of_ibo_style_record_list(
+    ibo_style_df_list: List[List[IBOStyleDf]]
+) -> List[List[IBOStyleRecord]]:
+    """Convert list of IBO style dataframe to list of list of IBO style record.
 
     Args:
         ibo_style_df_list (List[pd.DataFrame]): list of IBO style dataframe
 
     Returns:
-        ibo_style_record_list (List[IBOStyleRecord]): list of IBO style record
+        list_of_ibo_style_record_list (List[List[IBOStyleRecord]]): list of IBO style record list
     """
-    ibo_style_record_list: List[IBOStyleRecord] = []
+    list_of_ibo_style_record_list: List[List[IBOStyleRecord]] = []
 
     for ibo_style_df in ibo_style_df_list:
-        ibo_style_record_list.extend(ibo_style_df.to_dict("records"))
+        list_of_ibo_style_record_list.append(ibo_style_df.to_dict("records"))
 
-    return ibo_style_record_list
+    return list_of_ibo_style_record_list
 
 
-def save_ibo_style_record_list(
-    output_path: str, ibo_style_record_list: List[IBOStyleRecord]
+def save_list_of_ibo_style_record_list(
+    output_path: str, list_of_ibo_style_record_list: List[List[IBOStyleRecord]]
 ) -> None:
-    """Save IBO style record list to output path in JSON format.
+    """Save list of IBO style record list to output path in JSON format.
 
     Args:
         output_path (str): output path
-        ibo_style_record_list (List[IBOStyleRecord]): list of IBO style record
+        list_of_ibo_style_record_list (List[List[IBOStyleRecord]]): list of IBO style record list
     """
     try:
         with open(output_path, "w") as f:
-            json.dump(ibo_style_record_list, f, indent=4, ensure_ascii=False)
+            json.dump(list_of_ibo_style_record_list, f, ensure_ascii=False, indent=4)
     except FileNotFoundError:
         print("Output path does not exist!")
     except json.JSONDecodeError:
@@ -262,8 +262,8 @@ def main():
     tokenizer = janome.tokenizer.Tokenizer()
     doccano_exported_df: DoccanoExportedDf = load_doccano_exported_df(args.input_path)
     ibo_style_df_list = doccano_exported_df_to_ibo_style_df_list(doccano_exported_df, tokenizer)
-    ibo_style_record_list = ibo_style_df_list_to_ibo_style_record_list(ibo_style_df_list)
-    save_ibo_style_record_list(args.output_path, ibo_style_record_list)
+    list_of_ibo_style_record_list = ibo_style_df_list_to_list_of_ibo_style_record_list(ibo_style_df_list)
+    save_list_of_ibo_style_record_list(args.output_path, list_of_ibo_style_record_list)
 
 
 if __name__ == "__main__":
