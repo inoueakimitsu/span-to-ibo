@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "span-to-ibo"
+version = "0.1.0"
+description = ""
+authors = ["Akimitsu Inoue <inoue.akimitsu.github@chino-js.com>"]
+readme = "README.md"
+packages = [{include = "span_to_ibo"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+janome = "^0.4.2"
+pandas = "^1.5.3"
+
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
