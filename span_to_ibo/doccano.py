@@ -26,6 +26,45 @@ IBOStyleRecord = TypedDict(
 )
 
 
+def text_to_ibo_style_record_list(
+        text: str, tokenizer: janome.tokenizer.Tokenizer, label_place_holder: str = "O"
+        ) -> List[IBOStyleRecord]:
+    """Convert text to IBO style record list.
+
+    Args:
+        text (str):
+            sentence or multiple sentence as a string
+            includes multiple phrases.
+            each phrase is separated by a space.
+            ex. "東京都渋谷区渋谷 ２丁目２−８ 渋谷マークシティ"
+        label_place_holder (str): label place holder
+        tokenizer (janome.tokenizer.Tokenizer):
+            tokenizer
+    
+    Returns:
+        iob_record_list (List[IBOStyleRecord]):
+            IBO style record list
+    """
+    iob_record_list = []
+    for token in tokenizer.tokenize(text):
+        iob_record_list.append({
+            "word": token.surface,
+            "label": label_place_holder,
+            "pos_tag": token.part_of_speech.split(",")[0],
+            "pos_tag[:2]": ",".join(token.part_of_speech.split(",")[:2]),
+            "pos_tag_all": token.part_of_speech,
+            "BOS": False,
+            "EOS": False,
+        })
+
+    # set BOS and EOS
+    if len(iob_record_list) > 0:
+        iob_record_list[0]["BOS"] = True
+        iob_record_list[-1]["EOS"] = True
+
+    return iob_record_list
+
+
 def parse_args() -> Any:
     """Parse command line arguments.
 
