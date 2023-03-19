@@ -155,7 +155,7 @@ def convert_text_to_ibo_style_df_list(
     return iob_df
 
 
-def doccano_exported_df_to_ibo_style_df(
+def doccano_exported_df_to_ibo_style_df_list(
     doccano_exported_df: DoccanoExportedDf, tokenizer: janome.tokenizer.Tokenizer
 ) -> List[IBOStyleDf]:
     """Convert doccano exported dataframe to list of IBO style dataframe.
@@ -261,7 +261,7 @@ def main():
     args = parse_args()
     tokenizer = janome.tokenizer.Tokenizer()
     doccano_exported_df: DoccanoExportedDf = load_doccano_exported_df(args.input_path)
-    ibo_style_df_list = doccano_exported_df_to_ibo_style_df(doccano_exported_df, tokenizer)
+    ibo_style_df_list = doccano_exported_df_to_ibo_style_df_list(doccano_exported_df, tokenizer)
     ibo_style_record_list = ibo_style_df_list_to_ibo_style_record_list(ibo_style_df_list)
     save_ibo_style_record_list(args.output_path, ibo_style_record_list)
 
