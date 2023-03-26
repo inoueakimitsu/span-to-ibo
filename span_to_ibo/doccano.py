@@ -204,56 +204,46 @@ def doccano_exported_df_to_ibo_style_df_list(
         tokenizer (janome.tokenizer.Tokenizer): tokenizer
 
     Returns:
-        iob_style_df_list (List[pd.DataFrame]): list of IBO style dataframe
+        df_ibo_list (List[pd.DataFrame]): list of IBO style dataframe
     """
-    iob_style_df_list: List[IBOStyleDf] = []
+    df_ibo_list = []
 
-    # initialize the temporary dataframe
-    doccano_exported_df = doccano_exported_df.copy()
-
-    for _, sentence_row in doccano_exported_df.iterrows():
-
-        current_position: int = 0
-
-        # sort the elements of the list by the start index
-        # refer:
-        # https://github.com/ToshihikoSakai/jsontoconll/blob/master/jsontoformat.py
-        doccano_exported_df['label'] = [sorted(labels) for labels in doccano_exported_df['label']]
-
-        # get the words and labels
-        words_labels = [list((sentence_row['text'][label[0]:label[1]], label[2])) for label in sentence_row['label']]
-        if len(words_labels) == 0:
-            continue
-
-        # split the words and labels
-        words, labels = list([list(label) for label in zip(*words_labels)])
-
-        # add spaces around the words
-        for word, label in zip(words, labels):
-            word_pattern = re.compile(re.escape(word))
-
-            for word_match in word_pattern.finditer(sentence_row["text"]):
-                str_list = list(sentence_row["text"])
-
-                # if the word is already surrounded by spaces, skip
-                if word_match.start() >= current_position:
-                    str_list.insert(int(word_match.end()), " ")
-                    str_list.insert(int(word_match.start()), " ")
-                    str_list = "".join(str_list)
-                    current_position = int(word_match.end())
-                    break
+    for _, sentence_row in df.iterrows():
+        cursor_position = 0
+        text = sentence_row.text
+        labels = sentence_row.label
+        tokens = []
+        previous_label_index = -1
+        for token in tokenizer.tokenize(text):
+            
+            label = [(i_label, label) for i_label, label in enumerate(labels) if label[0] <= cursor_position and cursor_position < label[1]]
+            if len(label) == 1:
+                i_label, label = label[0]
+                label = label[2]
+                if previous_label_index == i_label:
+                    label = "I-" + label
                 else:
-                    str_list = "".join(str_list)
+                    label = "B-" + label
+                    previous_label_index = i_label
+            elif len(label) == 0:
+                label = "O"
+            else:
+                raise ValueError(label)
 
-            sentence_row["text"] = str_list
+            tokens.append({
+                "word": token.surface,
+                "label": label,
+                "pos_tag": token.part_of_speech.split(",")[0],
+                "pos_tag[:2]": ",".join(token.part_of_speech.split(",")[:2]),
+                "pos_tag_all": token.part_of_speech,
+                "BOS": False,
+                "EOS": False,
+            })
+            cursor_position += len(token.surface)
 
-        # combine multiple consecutive blanks into one
-        sentence_row["text"] = " ".join(sentence_row["text"].split())
-        ibo_style_df = convert_text_to_ibo_style_df_list(
-            sentence_row["text"], words, labels, tokenizer)
-        iob_style_df_list.append(ibo_style_df)
-
-    return iob_style_df_list
+        df_ibo_list.append(pd.DataFrame(tokens))
+    
+    return df_ibo_list
 
 
 def ibo_style_df_list_to_list_of_ibo_style_record_list(
