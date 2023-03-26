@@ -208,7 +208,7 @@ def doccano_exported_df_to_ibo_style_df_list(
     """
     df_ibo_list = []
 
-    for _, sentence_row in df.iterrows():
+    for _, sentence_row in doccano_exported_df.iterrows():
         cursor_position = 0
         text = sentence_row.text
         labels = sentence_row.label
