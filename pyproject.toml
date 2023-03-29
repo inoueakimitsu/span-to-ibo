@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "span-to-ibo"
 version = "0.1.0"
-description = ""
-authors = ["Akimitsu Inoue <inoue.akimitsu.github@chino-js.com>"]
+description = "This is a script to convert the output file of doccano to a format that is easy to handle with sklearn-crfsuite."
+authors = ["Akimitsu Inoue <inoue.akimitsu@gmail.com>"]
+homepage = "https://github.com/inoueakimitsu/span-to-ibo"
+repository = "https://github.com/inoueakimitsu/span-to-ibo"
 readme = "README.md"
 packages = [{include = "span_to_ibo"}]
 
